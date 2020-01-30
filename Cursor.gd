@@ -3,6 +3,9 @@ extends Node
 var cursorVisible = false
 var cursorActive = false
 
+func _ready():
+    get_node("/root/Game").connect("game_init_cursor", self, "init")
+
 func _input(event):
     if !(event is InputEventKey) || !cursorVisible:
         return
@@ -21,6 +24,9 @@ func _input(event):
         var nextY = currentRectPos.y - (get_node("/root/Game").TILE_SIZE * moveTileNum) if yDirection < 0 else currentRectPos.y + (get_node("/root/Game").TILE_SIZE * moveTileNum)
         nextY = clamp(nextY, cameraNode.limit_top, cameraNode.limit_bottom - get_node("/root/Game").TILE_SIZE)
         $Rect.set_position(Vector2(currentRectPos.x, nextY))
+    
+    if event.get_action_strength("select") > 0:
+        get_node("/root/Game").handleCursorSelect()
 
 func init(pos = Vector2(0, 0)):
     $Rect.rect_position = pos
