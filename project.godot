@@ -19,6 +19,10 @@ config/name="slash_stab_strike"
 run/main_scene="res://Main.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+Game="*res://logic/Game.tscn"
+
 [display]
 
 window/size/width=640
