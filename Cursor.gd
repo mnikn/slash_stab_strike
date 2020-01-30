@@ -1,11 +1,5 @@
 extends Node
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
-
-# Called when the node enters the scene tree for the first time.
-
 const TILE_SIZE = 16
 const TILE_NUM_X = 30
 const TILE_NUM_Y = 30
