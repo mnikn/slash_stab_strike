@@ -1,0 +1,224 @@
+{
+  "protocol_version" : "0.0.3",
+  "configuration" : {
+    "version" : "(5.18.1.3) (tarball)",
+    "tlc" : "normal",
+    "sigsgev" : "normal",
+    "notifications" : "kqueue",
+    "architecture" : "amd64",
+    "disabled_features" : "none",
+    "smallconfig" : "disabled",
+    "bigarrays" : "disabled",
+    "softdebug" : "enabled",
+    "interpreter" : "enabled",
+    "llvm_support" : "disabled",
+    "suspend" : "preemptive"
+  },
+  "memory" : {
+    "Resident Size" : "218112000",
+    "Virtual Size" : "3593015296",
+    "minor_gc_time" : "0",
+    "major_gc_time" : "0",
+    "minor_gc_count" : "0",
+    "major_gc_count" : "0",
+    "major_gc_time_concurrent" : "0"
+ },
+  "threads" : [
+ {
+    "is_managed" : false,
+    "offset_free_hash" : "0x0",
+    "offset_rich_hash" : "0x0",
+    "crashed" : true,
+    "native_thread_id" : "0x7fff9e7133c0",
+    "thread_info_addr" : "0x7fa271152400",
+    "thread_name" : "tid_307",
+    "ctx" : {
+      "IP" : "0x10e2c7864",
+      "SP" : "0x7fff53f2ea70",
+      "BP" : "0x7fff53f2ea70"
+  },
+    "unmanaged_frames" : [
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+
+  ]
+ },
+ {
+    "is_managed" : false,
+    "offset_free_hash" : "0x0",
+    "offset_rich_hash" : "0x0",
+    "crashed" : false,
+    "native_thread_id" : "0x7000028c9000",
+    "thread_info_addr" : "0x7fa2700baa00",
+    "thread_name" : "Finalizer",
+    "ctx" : {
+      "IP" : "0x7fff9590a386",
+      "SP" : "0x7000028c8d48",
+      "BP" : "0x7000028c8e00"
+  },
+    "unmanaged_frames" : [
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+,
+  {
+      "native_address" : "unregistered"
+   }
+
+  ]
+ }
+ ]
+}

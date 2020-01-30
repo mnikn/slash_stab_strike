@@ -36,3 +36,6 @@ func _input(event):
         var nextY = currentRectPos.y - (TILE_SIZE * moveTileNum) if yDirection < 0 else currentRectPos.y + (TILE_SIZE * moveTileNum)
         nextY = clamp(nextY, cameraNode.limit_top, cameraNode.limit_bottom - TILE_SIZE)
         rectNode.set_position(Vector2(currentRectPos.x, nextY))
+
+func init(pos = Vector2(0, 0)):
+    get_node("Rect").rect_position = pos
