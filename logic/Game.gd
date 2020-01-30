@@ -21,10 +21,11 @@ func init():
     map[0][0]["type"] = "cursor"
     map[10][10]["type"] = "player"
     
+    print("asdw")
     # emit signal update view
-    emit_signal("game_init_cursor")
     emit_signal("game_init_map")
-    emit_signal("game_init_character", Vector2(10 * TILE_SIZE, 10 * TILE_SIZE))
+    emit_signal("game_init_cursor")
+    emit_signal("game_init_character", Vector2(10, 10))
     # ColorRect.new()
     pass
 

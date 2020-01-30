@@ -3,9 +3,6 @@ extends Node
 var cursorVisible = false
 var cursorActive = false
 
-func _ready():
-    get_node("/root/Game").connect("game_init_cursor", self, "init")
-
 func _input(event):
     if !(event is InputEventKey) || !cursorVisible:
         return
@@ -38,9 +35,6 @@ func init(pos = Vector2(0, 0)):
     cameraNode.limit_top = 0
     cameraNode.limit_right = get_node("/root/Game").TILE_SIZE * get_node("/root/Game").TILE_NUM_X
     cameraNode.limit_bottom = get_node("/root/Game").TILE_SIZE * get_node("/root/Game").TILE_NUM_Y
-    
-    # connect("game_cursor_active", self, "setCursorActive")
-    # get_node("/root/Main/Game")
     
 func setCursorVisible(visible):
     cursorVisible = visible
