@@ -20,7 +20,13 @@ class Character:
         move_range.remove(pos)
         return move_range
     func _do_get_move_range(current_pos, limit_step, results):
-        if (limit_step < 0 || current_pos.x < 0 || current_pos.x >= _map.width || current_pos.y < 0 || current_pos.y >= _map.height):
+        if (limit_step < 0 || 
+            current_pos.x < 0 || 
+            current_pos.x >= _map.width || 
+            current_pos.y < 0 || 
+            current_pos.y >= _map.height):
+            return results
+        if self._map.get(current_pos).terrain_type == Map.TERRAIN_TYPE.BLOCK:
             return results
         results.append(current_pos)
         _do_get_move_range(Map.MapPos.new(current_pos.x + 1, current_pos.y), limit_step - 1, results)
