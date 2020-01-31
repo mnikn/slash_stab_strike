@@ -13,21 +13,20 @@ const TILE_NUM_Y = 30
 var map
 var cursor_pos
 var select_character = null
-var select_character_move_range = null
+var cache_select_character_move_range
 
 func init():
-    select_character_move_range = Utils.Set.new()
+    cache_select_character_move_range = Utils.Set.new()
     cursor_pos = Map.MapPos.new()
-    map = Map.Map.new(TILE_SIZE, TILE_NUM_X, TILE_NUM_Y)
-    var player = map.get(Map.MapPos.new(10, 10))
-    player.type = "player"
-    player.id = "player"
+    map = Map.Map.new(TILE_NUM_X, TILE_NUM_Y)
     
+    var mock_character_pos = Map.MapPos.new(10, 10)
+    map.get(mock_character_pos).item = Character.Character.new(map, mock_character_pos)
     
     # emit signal update view
     emit_signal("game_init_map")
     emit_signal("game_init_cursor")
-    emit_signal("game_init_character", Vector2(10, 10))
+    emit_signal("game_init_character", mock_character_pos)
     # ColorRect.new()
     pass
 
@@ -50,33 +49,16 @@ func _input(event):
         handle_cursor_select()
 
 func handle_cursor_select():
-    var player_pos = map.find_by_id("player").pos
+    var current_pos_item = map.get(cursor_pos).item
     if select_character != null:
-        if select_character_move_range.has(cursor_pos):
+        if cache_select_character_move_range.has(cursor_pos):
+            select_character.move_to(cursor_pos)            
             emit_signal("game_move_character", cursor_pos)
-            map.move("player", cursor_pos)
-            # playerPos = cursor_pos.clone()
+        cache_select_character_move_range.clear()
         select_character = null
-        select_character_move_range.clear()
         emit_signal("game_hide_character_move_range")
-    elif cursor_pos.equal(player_pos):
-        var move_range = get_character_move_range(player_pos)
-        move_range.remove(player_pos)
-        select_character_move_range = move_range
-        # todo: get real character info
-        select_character = {}
+    elif current_pos_item is Character.Character:
+        var move_range = current_pos_item.get_move_range()
+        cache_select_character_move_range = move_range
+        select_character = current_pos_item
         emit_signal("game_show_character_move_range", move_range.to_array())
-
-func get_character_move_range(characterMapPos):
-    # todo: get real move range
-    return do_get_character_move_range(characterMapPos, 4, Utils.Set.new())
-    
-func do_get_character_move_range(character_pos, limitStep, results):
-    if (limitStep < 0 || character_pos.x < 0 || character_pos.x >= TILE_NUM_X || character_pos.y < 0 || character_pos.y >= TILE_NUM_Y):
-        return results
-    results.append(character_pos)
-    do_get_character_move_range(Map.MapPos.new(character_pos.x + 1, character_pos.y), limitStep - 1, results)
-    do_get_character_move_range(Map.MapPos.new(character_pos.x - 1, character_pos.y), limitStep - 1, results)
-    do_get_character_move_range(Map.MapPos.new(character_pos.x, character_pos.y + 1), limitStep - 1, results)
-    do_get_character_move_range(Map.MapPos.new(character_pos.x, character_pos.y - 1), limitStep - 1, results)
-    return results

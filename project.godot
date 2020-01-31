@@ -23,6 +23,7 @@ config/icon="res://icon.png"
 
 Utils="*res://logic/Utils.gd"
 Map="*res://logic/Map.gd"
+Character="*res://logic/Character.gd"
 Game="*res://logic/Game.gd"
 
 [display]

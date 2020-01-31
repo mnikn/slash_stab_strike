@@ -12,6 +12,8 @@ class Set:
         return self._dic.values()
     func clear():
         return self._dic.clear()
+    func size():
+        return self._dic.size()
     func _hash(item):
         if item is Object && item.has_method("hash"):
             return item.hash()

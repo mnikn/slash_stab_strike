@@ -2,13 +2,17 @@ extends Node
 
 class Map:
     var _map = []
-    func _init(tile_size, tile_num_x, tile_num_y):
+    var height = 0
+    var width = 0
+    func _init(tile_num_x, tile_num_y):
         for i in range(tile_num_x):
             for j in range(tile_num_y):
                 var item = MapItem.new(MapPos.new(i, j))
                 if i == 0 || i == tile_num_x - 1 || j == 0 || j == tile_num_y - 1:
-                    item.type = MAP_ITEM_TYPE.BLOCK
+                    item.terrain_type = TERRAIN_TYPE.BLOCK
                 _map.push_back(item)
+        height = tile_num_y
+        width = tile_num_x
     func get(pos):
         for item in _map:
             if item.pos.equal(pos):
@@ -20,25 +24,23 @@ class Map:
     #            _map[i] = val
     #    var item = { "pos": pos, "type": val["type"]}
     #    _map.push_back(item)
-    func find(type):
-        var result = []
-        for item in _map:
-            if item.type == type:
-                result.push_back(item)
-        return result
+#    func find(type):
+#        var result = []
+#        for item in _map:
+#            if item.type == type:
+#                result.push_back(item)
+#        return result
     func find_by_id(id):
         for item in _map:
             if item.id != null && item.id == id:
                 return item
         return null
-    func move(id, target_pos):
-        var item = self.find_by_id(id)
-        if item == null:
-            return
-        var origin_item = self.get(target_pos)        
-        if origin_item != null:
-            origin_item.pos = item.pos.clone()
-        item.pos = target_pos.clone()
+    func to_string():
+        var res = ""
+        for item in _map:
+            res += "pos: " + item.pos.to_string() + " item: " + str(item.item) + "\n"
+        return res
+    
 
 class MapPos:
     var x = 0
@@ -58,16 +60,17 @@ class MapPos:
     func clone():
         return MapPos.new(self.x, self.y)
         
-enum MAP_ITEM_TYPE {
-    NORMAL,
+enum TERRAIN_TYPE {
+    PLAIN,
     BLOCK
 }
 
 class MapItem:
-    var type
+    var terrain_type
+    var item
     var id
     var pos
-    func _init(pos = MapPos.new(), type = MAP_ITEM_TYPE.NORMAL, id = null):
+    func _init(pos = MapPos.new(), type = TERRAIN_TYPE.PLAIN, id = null):
         self.id = id
         self.pos = pos
-        self.type = type
+        self.terrain_type = type
