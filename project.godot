@@ -22,6 +22,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Game="*res://logic/Game.tscn"
+utils="*res://logic/utils.gd"
 
 [display]
 
