@@ -16,8 +16,7 @@ class Character:
         _map.get(next_pos).item = self
         self.pos = next_pos
     func get_move_range():
-        var move_range = _do_get_move_range(pos, _step, Utils.Set.new())       
-        move_range.remove(pos)
+        var move_range = _do_get_move_range(pos, _step, Utils.Set.new())
         return move_range
     func _do_get_move_range(current_pos, limit_step, results):
         if (limit_step < 0 || 

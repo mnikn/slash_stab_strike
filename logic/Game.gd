@@ -1,10 +1,10 @@
 extends Node
 signal game_show_character_move_range(move_range)
-signal game_move_character(move_pos)
+signal game_move_character(move_pos, character_id)
 signal game_hide_character_move_range()
 signal game_init_map(mapPos)
 signal game_init_cursor(mapPos)
-signal game_init_character(mapPos)
+signal game_init_character(map_pos, character_id)
 signal game_move_cursor(mapPos)
 signal game_create_action_panel()
 signal game_destory_action_panel()
@@ -28,15 +28,21 @@ func init():
     
     var mock_character_pos = Map.MapPos.new(10, 10)
     map.get(mock_character_pos).item = Character.Character.new(map, mock_character_pos)
+    map.get(mock_character_pos).item.id = 1
+    
+    
+    var mock_enemy_pos = Map.MapPos.new(20, 15)
+    map.get(mock_enemy_pos).item = Character.Character.new(map, mock_enemy_pos)
+    map.get(mock_enemy_pos).item.id = 2
     
     # emit signal update view
     emit_signal("game_init_map")
     emit_signal("game_init_cursor", Map.MapPos.new())
-    emit_signal("game_init_character", mock_character_pos)
+    emit_signal("game_init_character", mock_character_pos, 1)
+    emit_signal("game_init_character", mock_enemy_pos, 2)
     
     connect("game_action_attack", self, "on_action_attack")
     connect("game_action_wait", self, "on_action_wait")
-    pass
 
 func _input(event):
     if !(event is InputEventKey):
@@ -68,7 +74,7 @@ func handle_cursor_select():
         var cursor_pos = cursor.pos
         if cache_select_character_move_range.has(cursor_pos):
             cursor.selected_item.move_to(cursor_pos)            
-            emit_signal("game_move_character", cursor_pos)
+            emit_signal("game_move_character", cursor_pos, cursor.selected_item.id)
             emit_signal("game_create_action_panel")
             during_action = true
         cache_select_character_move_range.clear()
