@@ -24,30 +24,66 @@ class MapPos:
         return self.x == pos.x && self.y == pos.y
     func clone():
         return MapPos.new(self.x, self.y)
-
+        
+class Map:
+    var _map = []
+    func _init(tile_size, tile_num_x, tile_num_y):
+        for i in range(tile_num_x):
+            for j in range(tile_num_y):
+                var item = {
+                    "id": null,
+                    "type": "normal",
+                    "pos": MapPos.new(i, j)
+                }
+                if i == 0 || i == tile_num_x - 1 || j == 0 || j == tile_num_y - 1:
+                    item["type"] = "block"
+                _map.push_back(item)
+    func get(pos):
+        for item in _map:
+            if item.pos.equal(pos):
+                return item
+        return null
+    func set(pos, val):
+        for i in range(len(_map)):
+            if _map[i].pos.equal(pos):
+                _map[i] = val
+        var item = { "pos": pos, "type": val["type"]}
+        _map.push_back(item)
+    func find(type):
+        var result = []
+        for item in _map:
+            if item.type == type:
+                result.push_back(item)
+        return result
+    func find_by_id(id):
+        for item in _map:
+            if item.id != null && item.id == id:
+                return item
+        return null
+    func move(id, target_pos):
+        var item = self.find_by_id(id)
+        if item == null:
+            return
+        var origin_item = self.get(target_pos)        
+        if origin_item != null:
+            origin_item.pos = item.pos.clone()
+        item.pos = target_pos.clone()
+                    
 const TILE_SIZE = 16
 const TILE_NUM_X = 30
 const TILE_NUM_Y = 30
-var map = []
+var map = null
 var cursor_pos = MapPos.new()
-var playerPos = MapPos.new()
 var select_character = null
 var select_character_move_range = null
 
 func init():
     select_character_move_range = Utils.Set.new()
-    for i in range(TILE_NUM_X):
-        map.insert(i, [])
-        for j in range(TILE_NUM_Y):
-            map[i].insert(j, {
-                "type": "normal"    
-            })
-            if i == 0 || i == TILE_NUM_X - 1 || j == 0 || j == TILE_NUM_Y - 1:
-                map[i][j]["type"] = "block"
-    map[0][0]["type"] = "cursor"
-    map[10][10]["type"] = "player"
+    map = Map.new(TILE_SIZE, TILE_NUM_X, TILE_NUM_Y)
+    var player = map.get(MapPos.new(10, 10))
+    player["type"] = "player"
+    player["id"] = "player"
     
-    playerPos.update(10, 10)
     
     # emit signal update view
     emit_signal("game_init_map")
@@ -75,16 +111,18 @@ func _input(event):
         handle_cursor_select()
 
 func handle_cursor_select():
+    var player_pos = map.find_by_id("player").pos
     if select_character != null:
         if select_character_move_range.has(cursor_pos):
             emit_signal("game_move_character", cursor_pos)
-            playerPos = cursor_pos.clone()
+            map.move("player", cursor_pos)
+            # playerPos = cursor_pos.clone()
         select_character = null
         select_character_move_range.clear()
         emit_signal("game_hide_character_move_range")
-    elif cursor_pos.equal(playerPos):
-        var move_range = get_character_move_range(playerPos)
-        move_range.remove(playerPos)
+    elif cursor_pos.equal(player_pos):
+        var move_range = get_character_move_range(player_pos)
+        move_range.remove(player_pos)
         select_character_move_range = move_range
         # todo: get real character info
         select_character = {}
