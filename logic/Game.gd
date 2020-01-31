@@ -6,6 +6,12 @@ signal game_init_map(mapPos)
 signal game_init_cursor(mapPos)
 signal game_init_character(mapPos)
 signal game_move_cursor(mapPos)
+signal game_create_action_panel()
+signal game_destory_action_panel()
+signal game_create_attack_panel()
+signal game_destory_attack_panel()
+signal game_action_attack()
+signal game_action_wait()
         
 const TILE_SIZE = 16
 const TILE_NUM_X = 30
@@ -13,6 +19,7 @@ const TILE_NUM_Y = 30
 var map
 var cursor
 var cache_select_character_move_range
+var during_action = false
 
 func init():
     cache_select_character_move_range = Utils.Set.new()
@@ -24,8 +31,11 @@ func init():
     
     # emit signal update view
     emit_signal("game_init_map")
-    emit_signal("game_init_cursor")
+    emit_signal("game_init_cursor", Map.MapPos.new())
     emit_signal("game_init_character", mock_character_pos)
+    
+    connect("game_action_attack", self, "on_action_attack")
+    connect("game_action_wait", self, "on_action_wait")
     pass
 
 func _input(event):
@@ -50,12 +60,17 @@ func _input(event):
         handle_cursor_select()
 
 func handle_cursor_select():
+    if during_action:
+        return
+
     var current_pos_item = map.get(cursor.pos).item
     if cursor.selected_item is Character.Character:
         var cursor_pos = cursor.pos
         if cache_select_character_move_range.has(cursor_pos):
             cursor.selected_item.move_to(cursor_pos)            
             emit_signal("game_move_character", cursor_pos)
+            emit_signal("game_create_action_panel")
+            during_action = true
         cache_select_character_move_range.clear()
         cursor.diselect()
         emit_signal("game_hide_character_move_range")
@@ -66,3 +81,8 @@ func handle_cursor_select():
         emit_signal("game_show_character_move_range", move_range.to_array())
     else:
         cursor.diselect()
+
+func on_action_attack():
+    during_action = false
+func on_action_wait():
+    during_action = false
