@@ -11,14 +11,13 @@ const TILE_SIZE = 16
 const TILE_NUM_X = 30
 const TILE_NUM_Y = 30
 var map
-var cursor_pos
-var select_character = null
+var cursor
 var cache_select_character_move_range
 
 func init():
     cache_select_character_move_range = Utils.Set.new()
-    cursor_pos = Map.MapPos.new()
     map = Map.Map.new(TILE_NUM_X, TILE_NUM_Y)
+    cursor = Cursor.Cursor.new(map)
     
     var mock_character_pos = Map.MapPos.new(10, 10)
     map.get(mock_character_pos).item = Character.Character.new(map, mock_character_pos)
@@ -27,7 +26,6 @@ func init():
     emit_signal("game_init_map")
     emit_signal("game_init_cursor")
     emit_signal("game_init_character", mock_character_pos)
-    # ColorRect.new()
     pass
 
 func _input(event):
@@ -38,27 +36,33 @@ func _input(event):
     var yDirection = event.get_action_strength("move_down") - event.get_action_strength("move_up")
     # fixme: modifier not work
     var moveTileNum = 5 if event.is_action_pressed("shift_modifer") else 1
+    var cursor_pos = cursor.pos.clone()
     if xDirection != 0:
         cursor_pos.x = clamp(cursor_pos.x - moveTileNum if xDirection < 0 else cursor_pos.x + moveTileNum, 0, TILE_NUM_X - 1)
     if yDirection != 0:
         cursor_pos.y = clamp(cursor_pos.y - moveTileNum if yDirection < 0 else cursor_pos.y + moveTileNum, 0, TILE_NUM_Y - 1)
+        
     if xDirection != 0 || yDirection != 0:
+        cursor.move_to(cursor_pos)
         emit_signal("game_move_cursor", cursor_pos)
     
     if event.is_action_pressed("select"):
         handle_cursor_select()
 
 func handle_cursor_select():
-    var current_pos_item = map.get(cursor_pos).item
-    if select_character != null:
+    var current_pos_item = map.get(cursor.pos).item
+    if cursor.selected_item is Character.Character:
+        var cursor_pos = cursor.pos
         if cache_select_character_move_range.has(cursor_pos):
-            select_character.move_to(cursor_pos)            
+            cursor.selected_item.move_to(cursor_pos)            
             emit_signal("game_move_character", cursor_pos)
         cache_select_character_move_range.clear()
-        select_character = null
+        cursor.diselect()
         emit_signal("game_hide_character_move_range")
     elif current_pos_item is Character.Character:
         var move_range = current_pos_item.get_move_range()
         cache_select_character_move_range = move_range
-        select_character = current_pos_item
+        cursor.select(current_pos_item)
         emit_signal("game_show_character_move_range", move_range.to_array())
+    else:
+        cursor.diselect()
