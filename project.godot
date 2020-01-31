@@ -21,8 +21,9 @@ config/icon="res://icon.png"
 
 [autoload]
 
-Game="*res://logic/Game.gd"
 Utils="*res://logic/Utils.gd"
+Map="*res://logic/Map.gd"
+Game="*res://logic/Game.gd"
 
 [display]
 
