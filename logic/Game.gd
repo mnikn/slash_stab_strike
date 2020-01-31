@@ -68,26 +68,18 @@ func _input(event):
 func handle_cursor_select():
     var move_range = get_character_move_range(playerPos)
     move_range.remove(playerPos)
-    print(move_range.to_array())
-    emit_signal("game_toggle_character_move_range")  
+    emit_signal("game_toggle_character_move_range", move_range.to_array())  
 
 func get_character_move_range(characterMapPos):
     # todo: get real move range
-    return do_get_character_move_range(characterMapPos, 4, utils.Set.new())
+    return do_get_character_move_range(characterMapPos, 4, Utils.Set.new())
     
-func do_get_character_move_range(characterMapPos, limitStep, results):
-    if (limitStep <= 0 || characterMapPos.x < 0 || characterMapPos.x >= TILE_NUM_X || characterMapPos.y < 0 || characterMapPos.y >= TILE_NUM_Y):
+func do_get_character_move_range(character_pos, limitStep, results):
+    if (limitStep < 0 || character_pos.x < 0 || character_pos.x >= TILE_NUM_X || character_pos.y < 0 || character_pos.y >= TILE_NUM_Y):
         return results
-    if results.has(characterMapPos):
-        return
-    results.append(characterMapPos.to_string())
-    var i = 1
-    characterMapPos = MapPos.new(characterMapPos.x + i, characterMapPos.y)
-    do_get_character_move_range(characterMapPos, limitStep - 1, results)
-    characterMapPos = MapPos.new(characterMapPos.x - i, characterMapPos.y)
-    do_get_character_move_range(characterMapPos, limitStep - 1, results)
-    characterMapPos = MapPos.new(characterMapPos.x, characterMapPos.y + 1)
-    do_get_character_move_range(characterMapPos, limitStep - 1, results)
-    characterMapPos = MapPos.new(characterMapPos.x, characterMapPos.y - 1)
-    do_get_character_move_range(characterMapPos, limitStep - 1, results)
+    results.append(character_pos)
+    do_get_character_move_range(MapPos.new(character_pos.x + 1, character_pos.y), limitStep - 1, results)
+    do_get_character_move_range(MapPos.new(character_pos.x - 1, character_pos.y), limitStep - 1, results)
+    do_get_character_move_range(MapPos.new(character_pos.x, character_pos.y + 1), limitStep - 1, results)
+    do_get_character_move_range(MapPos.new(character_pos.x, character_pos.y - 1), limitStep - 1, results)
     return results
