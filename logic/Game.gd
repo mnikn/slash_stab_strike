@@ -1,5 +1,7 @@
 extends Node
-signal game_toggle_character_move_range
+signal game_show_character_move_range(move_range)
+signal game_move_character(move_pos)
+signal game_hide_character_move_range()
 signal game_init_map(mapPos)
 signal game_init_cursor(mapPos)
 signal game_init_character(mapPos)
@@ -18,15 +20,20 @@ class MapPos:
         return "x: " + str(self.x) + " y: " + str(self.y) + "\n"
     func hash():
         return hash(self.to_string())
+    func equal(pos):
+        return self.x == pos.x && self.y == pos.y
 
 const TILE_SIZE = 16
 const TILE_NUM_X = 30
 const TILE_NUM_Y = 30
 var map = []
-var cursorMapPos = MapPos.new()
+var cursor_pos = MapPos.new()
 var playerPos = MapPos.new()
+var select_character = null
+var select_character_move_range = null
 
 func init():
+    select_character_move_range = Utils.Set.new()
     for i in range(TILE_NUM_X):
         map.insert(i, [])
         for j in range(TILE_NUM_Y):
@@ -56,19 +63,29 @@ func _input(event):
     # fixme: modifier not work
     var moveTileNum = 5 if event.is_action_pressed("shift_modifer") else 1
     if xDirection != 0:
-        cursorMapPos.x = clamp(cursorMapPos.x - moveTileNum if xDirection < 0 else cursorMapPos.x + moveTileNum, 0, TILE_NUM_X - 1)
+        cursor_pos.x = clamp(cursor_pos.x - moveTileNum if xDirection < 0 else cursor_pos.x + moveTileNum, 0, TILE_NUM_X - 1)
     if yDirection != 0:
-        cursorMapPos.y = clamp(cursorMapPos.y - moveTileNum if yDirection < 0 else cursorMapPos.y + moveTileNum, 0, TILE_NUM_Y - 1)
+        cursor_pos.y = clamp(cursor_pos.y - moveTileNum if yDirection < 0 else cursor_pos.y + moveTileNum, 0, TILE_NUM_Y - 1)
     if xDirection != 0 || yDirection != 0:
-        emit_signal("game_move_cursor", cursorMapPos)
+        emit_signal("game_move_cursor", cursor_pos)
     
     if event.is_action_pressed("select"):
         handle_cursor_select()
 
 func handle_cursor_select():
-    var move_range = get_character_move_range(playerPos)
-    move_range.remove(playerPos)
-    emit_signal("game_toggle_character_move_range", move_range.to_array())  
+    if select_character != null:
+        if select_character_move_range.has(cursor_pos):
+            emit_signal("game_move_character", cursor_pos)
+        select_character = null
+        select_character_move_range.clear()
+        emit_signal("game_hide_character_move_range")
+    elif cursor_pos.equal(playerPos):
+        var move_range = get_character_move_range(playerPos)
+        move_range.remove(playerPos)
+        select_character_move_range = move_range
+        # todo: get real character info
+        select_character = {}
+        emit_signal("game_show_character_move_range", move_range.to_array())
 
 func get_character_move_range(characterMapPos):
     # todo: get real move range
