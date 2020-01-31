@@ -16,3 +16,6 @@ class Set:
         if item is Object && item.has_method("hash"):
             return item.hash()
         return hash(item)
+        
+func get_physic_pos(map_pos):
+    return Vector2(map_pos.x * Game.TILE_SIZE, map_pos.y * Game.TILE_SIZE)

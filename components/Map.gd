@@ -1,11 +1,20 @@
 extends Node
 
 var move_range_rects = []
+var character = null
 
 func init(pos = Vector2(0, 0)):
     $TileMap.position = pos
+    Game.connect("game_init_character", self, "create_character")
     Game.connect("game_show_character_move_range", self, "show_character_move_range")
     Game.connect("game_hide_character_move_range", self, "hide_character_move_range")
+    Game.connect("game_move_character", self, "move_character")
+    
+func create_character(map_pos = Game.MapPos.new()):
+    var Character = load("res://components/Character.tscn").instance()
+    add_child(Character)
+    Character.init(map_pos)
+    character = Character
     
 func show_character_move_range(move_range):
     for pos in move_range:
@@ -20,5 +29,9 @@ func hide_character_move_range():
     for rect in move_range_rects:
         remove_child(rect)
     move_range_rects = []
+
+func move_character(map_pos):
+    if character != null:
+        character.move_to(map_pos)
     
     

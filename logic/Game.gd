@@ -22,6 +22,8 @@ class MapPos:
         return hash(self.to_string())
     func equal(pos):
         return self.x == pos.x && self.y == pos.y
+    func clone():
+        return MapPos.new(self.x, self.y)
 
 const TILE_SIZE = 16
 const TILE_NUM_X = 30
@@ -76,6 +78,7 @@ func handle_cursor_select():
     if select_character != null:
         if select_character_move_range.has(cursor_pos):
             emit_signal("game_move_character", cursor_pos)
+            playerPos = cursor_pos.clone()
         select_character = null
         select_character_move_range.clear()
         emit_signal("game_hide_character_move_range")

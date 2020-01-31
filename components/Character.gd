@@ -1,9 +1,8 @@
 extends Node
 
-var playerSelected = false
-
-func init(pos = Vector2(0, 0)):
+func init(map_pos):
+    var pos = Utils.get_physic_pos(map_pos)
     $Sprite.position = pos
     
-func onPlayerClick():
-    playerSelected = !playerSelected
+func move_to(map_pos):
+    $Sprite.position = Utils.get_physic_pos(map_pos)
