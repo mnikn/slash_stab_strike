@@ -4,14 +4,13 @@ signal game_hide_character_move_range()
 signal game_show_character_attack_range(attack)
 signal game_hide_character_attack_range()
 signal game_move_character(move_pos, character_id)
-signal game_init_map(mapPos)
 signal game_init_cursor(map_pos)
 signal game_create_character(map_pos, character_id)
 signal game_move_cursor(mapPos)
-signal game_create_action_panel()
-signal game_destory_action_panel()
-signal game_create_attack_panel()
-signal game_destory_attack_panel()
+signal game_show_action_panel()
+signal game_hide_action_panel()
+signal game_show_attack_panel()
+signal game_hide_attack_panel()
 signal game_action_attack()
 signal game_action_wait()
         
@@ -41,7 +40,6 @@ func init():
     map.get(mock_enemy_pos).item.type = Character.CHARACTER_TYPE.ENEMY
     
     # emit signal update view
-    emit_signal("game_init_map")
     emit_signal("game_init_cursor", Map.MapPos.new())
     emit_signal("game_create_character", mock_character_pos, 1)
     emit_signal("game_create_character", mock_enemy_pos, 2)
@@ -91,7 +89,7 @@ func handle_cursor_select():
             && current_pos_item is Character.Character 
             && current_pos_item.type == Character.CHARACTER_TYPE.ENEMY):
             ## todo: do real process
-            emit_signal("game_create_attack_panel")
+            emit_signal("game_show_attack_panel")
             emit_signal("game_hide_character_attack_range")
             player_character.switch_to_state(Character.CHARACTER_ACTION_STATE.IDLE)
             cache_select_character_attack_range.clear()
@@ -101,7 +99,7 @@ func handle_cursor_select():
             if cache_select_character_move_range.has(cursor_pos):
                 cursor.selected_item.move_to(cursor_pos)            
                 emit_signal("game_move_character", cursor_pos, cursor.selected_item.id)
-                emit_signal("game_create_action_panel")
+                emit_signal("game_show_action_panel")
                 during_action_select = true
             else:
                 cursor.diselect()
