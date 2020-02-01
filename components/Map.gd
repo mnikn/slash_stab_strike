@@ -1,6 +1,7 @@
 extends Node
 
 var move_range_rects = []
+var attack_range_rects = []
 var characters = {}
 
 func init(pos = Vector2(0, 0)):
@@ -8,6 +9,8 @@ func init(pos = Vector2(0, 0)):
     Game.connect("game_create_character", self, "create_character")
     Game.connect("game_show_character_move_range", self, "show_character_move_range")
     Game.connect("game_hide_character_move_range", self, "hide_character_move_range")
+    Game.connect("game_show_character_attack_range", self, "show_character_attack_range")
+    Game.connect("game_hide_character_attack_range", self, "hide_character_attack_range")
     Game.connect("game_move_character", self, "move_character")
     Game.connect("game_init_cursor", self, "create_cursor")
     
@@ -30,11 +33,23 @@ func show_character_move_range(move_range):
         rect.rect_size = Vector2(Game.TILE_SIZE, Game.TILE_SIZE)
         add_child(rect)
         move_range_rects.push_back(rect)
-        
 func hide_character_move_range():
     for rect in move_range_rects:
         remove_child(rect)
     move_range_rects = []
+
+func show_character_attack_range(attack_range):
+    for pos in attack_range:
+        var rect = ColorRect.new()
+        rect.color = Color(0.945098, 0.070588, 0.070588, 0.392157)
+        rect.rect_position = Vector2(Game.TILE_SIZE * pos.x, Game.TILE_SIZE * pos.y)
+        rect.rect_size = Vector2(Game.TILE_SIZE, Game.TILE_SIZE)
+        add_child(rect)
+        attack_range_rects.push_back(rect)
+func hide_character_attack_range():
+    for rect in attack_range_rects:
+        remove_child(rect)
+    attack_range_rects = []
 
 func move_character(map_pos, character_id):
     if characters.has(character_id):

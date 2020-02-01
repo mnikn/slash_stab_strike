@@ -1,7 +1,9 @@
 extends Node
 signal game_show_character_move_range(move_range)
-signal game_move_character(move_pos, character_id)
 signal game_hide_character_move_range()
+signal game_show_character_attack_range(attack)
+signal game_hide_character_attack_range()
+signal game_move_character(move_pos, character_id)
 signal game_init_map(mapPos)
 signal game_init_cursor(map_pos)
 signal game_create_character(map_pos, character_id)
@@ -19,10 +21,12 @@ const TILE_NUM_Y = 30
 var map
 var cursor
 var cache_select_character_move_range
-var during_action = false
+var cache_select_character_attack_range
+var during_action_select = false
 
 func init():
     cache_select_character_move_range = Utils.Set.new()
+    cache_select_character_attack_range = Utils.Set.new()
     map = Map.Map.new(TILE_NUM_X, TILE_NUM_Y)
     cursor = Cursor.Cursor.new(map)
     
@@ -67,29 +71,42 @@ func _input(event):
         handle_cursor_select()
 
 func handle_cursor_select():
-    if during_action:
+    if during_action_select:
         return
 
     var current_pos_item = map.get(cursor.pos).item
-    if cursor.selected_item is Character.Character:
-        var cursor_pos = cursor.pos
-        if cache_select_character_move_range.has(cursor_pos):
-            cursor.selected_item.move_to(cursor_pos)            
-            emit_signal("game_move_character", cursor_pos, cursor.selected_item.id)
-            emit_signal("game_create_action_panel")
-            during_action = true
-        cache_select_character_move_range.clear()
-        cursor.diselect()
-        emit_signal("game_hide_character_move_range")
+    if cursor.selected_item is Character.Character && cursor.selected_item.type == Character.CHARACTER_TYPE.PLAYER:
+        var player_character = cursor.selected_item
+        if player_character.action_state == Character.CHARACTER_ACTION_STATE.ATTACK && cache_select_character_attack_range.has(cursor.pos):
+            ## todo: do real process
+            emit_signal("game_hide_character_attack_range")
+            player_character.switch_to_state(Character.CHARACTER_ACTION_STATE.IDLE)
+            cache_select_character_attack_range.clear()
+            cursor.diselect()
+        elif player_character.action_state == Character.CHARACTER_ACTION_STATE.IDLE:
+            var cursor_pos = cursor.pos
+            if cache_select_character_move_range.has(cursor_pos):
+                cursor.selected_item.move_to(cursor_pos)            
+                emit_signal("game_move_character", cursor_pos, cursor.selected_item.id)
+                emit_signal("game_create_action_panel")
+                during_action_select = true
+            else:
+                cursor.diselect()
+            cache_select_character_move_range.clear()
+            emit_signal("game_hide_character_move_range")
     elif current_pos_item is Character.Character && current_pos_item.type == Character.CHARACTER_TYPE.PLAYER:
-        var move_range = current_pos_item.get_move_range()
-        cache_select_character_move_range = move_range
-        cursor.select(current_pos_item)
-        emit_signal("game_show_character_move_range", move_range.to_array())
+        if current_pos_item.action_state == Character.CHARACTER_ACTION_STATE.IDLE:
+            var move_range = current_pos_item.get_move_range()
+            cache_select_character_move_range = move_range
+            cursor.select(current_pos_item)
+            emit_signal("game_show_character_move_range", move_range.to_array())
     else:
         cursor.diselect()
 
 func on_action_attack():
-    during_action = false
+    during_action_select = false
+    cursor.selected_item.switch_to_state(Character.CHARACTER_ACTION_STATE.ATTACK)
+    cache_select_character_attack_range = cursor.selected_item.get_attack_range()
+    emit_signal("game_show_character_attack_range", cache_select_character_attack_range.to_array())    
 func on_action_wait():
-    during_action = false
+    during_action_select = false
