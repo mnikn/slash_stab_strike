@@ -1,13 +1,5 @@
 extends Node
 
-enum CHARACTER_ROUND_STATE {
-    IDLE,
-    ACTION_SELECTING,    
-    MOVE_SELECTING,
-    ATTACK_SELECTING
-    END
-}
-
 enum CHARACTER_TEAM {
     PLAYER,
     ENEMY
@@ -26,7 +18,7 @@ class RoundCharacter:
         self.info = character
         self.pos = pos
         self.team = team
-        self.round_state = CHARACTER_ROUND_STATE.IDLE
+        self.round_state = RoundState.RoundStateIdle.new()
         self.history_actions = []
         self.initial_pos = pos
         
@@ -47,9 +39,9 @@ class Round:
         return null
     func get_selecting_character():
         for character in self.characters.values():
-            if (character.round_state == CHARACTER_ROUND_STATE.ACTION_SELECTING ||
-                character.round_state == CHARACTER_ROUND_STATE.MOVE_SELECTING || 
-                character.round_state == CHARACTER_ROUND_STATE.ATTACK_SELECTING):
+            if (character.round_state is RoundState.RoundStateActionSelecting ||
+                character.round_state is RoundState.RoundStateAttackSelecting || 
+                character.round_state is RoundState.RoundStateMoveSelecting):
                 return character
         return null
         
@@ -63,25 +55,21 @@ class Round:
             character.history_actions.pop_back()
     func cancel_action():
         var character = self.get_selecting_character()
-        if character != null && character.round_state != CHARACTER_ROUND_STATE.END:
-            if character.round_state == CHARACTER_ROUND_STATE.ACTION_SELECTING:
+        if character != null && !(character.round_state is RoundState.RoundStateEnd):
+            if character.round_state is RoundState.RoundStateActionSelecting:
                 self.character_action_undo(character.id)
-                Events.emit_signal("HIDE_ACTION_PANEL")
-                character.round_state = CHARACTER_ROUND_STATE.IDLE
-            elif character.round_state == CHARACTER_ROUND_STATE.ATTACK_SELECTING:
-                Events.emit_signal("MAP_HIDE_CHARACTER_ATTACK_RANGE")
-                Events.emit_signal("SHOW_ACTION_PANEL")
-                character.round_state = CHARACTER_ROUND_STATE.ACTION_SELECTING
+                character.round_state = character.round_state.switch_to_idle()
+            elif character.round_state is RoundState.RoundStateAttackSelecting:
+                character.round_state = character.round_state.switch_to_action_selecting()
     func show_character_move_range(character_id):
         var character = self.get_character(character_id)
-        if character.round_state != CHARACTER_ROUND_STATE.IDLE:
+        if !(character.round_state is RoundState.RoundStateIdle):
             return
         var move_range = self.get_character_move_range(character_id)
-        Events.emit_signal("MAP_SHOW_CHARACTER_MOVE_RANGE", move_range.to_array())
-        character.round_state = CHARACTER_ROUND_STATE.MOVE_SELECTING
+        character.round_state = character.round_state.switch_to_move_selecting(move_range)
     func move_character(character_id, target_pos):
         var character = self.get_character(character_id)
-        if character.round_state != CHARACTER_ROUND_STATE.MOVE_SELECTING:
+        if !(character.round_state is RoundState.RoundStateMoveSelecting):
             return
         var move_range = self.get_character_move_range(character_id)
         if move_range.has(target_pos):
@@ -89,28 +77,23 @@ class Round:
             move_action.process(character, target_pos)
             character.history_actions.append(move_action)
             
-            character.round_state = CHARACTER_ROUND_STATE.ACTION_SELECTING            
-            Events.emit_signal("MAP_HIDE_CHARACTER_MOVE_RANGE")
-            Events.emit_signal("SHOW_ACTION_PANEL")
+            character.round_state = character.round_state.switch_to_action_selecting()
             
     func show_character_attack_range():
         var character = self.get_selecting_character()
-        if character == null || character.round_state != CHARACTER_ROUND_STATE.ACTION_SELECTING:
+        if character == null || !(character.round_state is RoundState.RoundStateActionSelecting):
             return
         var attack_range = self.get_character_attack_range(character.id)
-        Events.emit_signal("MAP_SHOW_CHARACTER_ATTACK_RANGE", attack_range.to_array())
-        Events.emit_signal("HIDE_ACTION_PANEL")
-        character.round_state = CHARACTER_ROUND_STATE.ATTACK_SELECTING
+        character.round_state = character.round_state.switch_to_attack_selecting(attack_range)
         
     func character_wait():
         var character = self.get_selecting_character()
-        if character == null || character.round_state != CHARACTER_ROUND_STATE.ACTION_SELECTING:
+        if character == null || !(character.round_state is RoundState.RoundStateActionSelecting):
             return
         var action = RoundAction.RoundActionWait.new()
         action.process()
         character.history_actions.append(action)
-        character.round_state = CHARACTER_ROUND_STATE.IDLE        
-        Events.emit_signal("HIDE_ACTION_PANEL")
+        character.round_state = character.round_state.switch_to_idle()
 
     func get_character_move_range(character_id):
         var character = self.get_character(character_id)

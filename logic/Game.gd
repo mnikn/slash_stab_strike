@@ -49,11 +49,11 @@ func handle_cursor_select():
     var current_round = round_manager.get_current_round()
     var pointing_character = current_round.get_character_by_pos(cursor.pos)
     var selecting_character = current_round.get_selecting_character()
-    if pointing_character != null && pointing_character.team == Round.CHARACTER_TEAM.PLAYER && pointing_character.round_state == Round.CHARACTER_ROUND_STATE.IDLE:
+    if pointing_character != null && pointing_character.team == Round.CHARACTER_TEAM.PLAYER && pointing_character.round_state is RoundState.RoundStateIdle:
         current_round.show_character_move_range(pointing_character.id)
     elif selecting_character != null:
-        if selecting_character.round_state == Round.CHARACTER_ROUND_STATE.MOVE_SELECTING:
+        if selecting_character.round_state is RoundState.RoundStateMoveSelecting:
             current_round.move_character(selecting_character.id, cursor.pos)
-        elif selecting_character.round_state == Round.CHARACTER_ROUND_STATE.ATTACK_SELECTING:
+        elif selecting_character.round_state == RoundState.RoundStateAttackSelecting:
             pass
             #current_round.character_select_attack_target(selecting_character.id)
