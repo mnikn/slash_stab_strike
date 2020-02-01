@@ -41,12 +41,30 @@ class Round:
         for character in self.characters.values():
             if (character.round_state is RoundState.RoundStateActionSelecting ||
                 character.round_state is RoundState.RoundStateAttackSelecting || 
-                character.round_state is RoundState.RoundStateMoveSelecting):
+                character.round_state is RoundState.RoundStateMoveSelecting ||
+                character.round_state is RoundState.RoundStateAttackPartSelecting):
                 return character
         return null
         
-    func character_attack(character_id, target_character_id):
-        pass
+    func show_attack_part(character_id, target_pos):
+        var character = self.get_character(character_id)
+        if !(character.round_state is RoundState.RoundStateAttackSelecting):
+            return
+        var target_character = self.get_character_by_pos(target_pos)
+        if target_character == null:
+            return
+        var attack_range = self.get_character_attack_range(character_id)
+        if attack_range.has(target_pos):
+            character.round_state = character.round_state.switch_to_attack_part_selecting(target_character)
+    func attack_character(character_id, target_character_id, attack_part):
+        var character = self.get_character(character_id)
+        var target_character = self.get_character(target_character_id)
+        if target_character == null || !(character.round_state is RoundState.RoundStateAttackPartSelecting):
+            return
+        var action = RoundAction.RoundActionAttack.new()
+        action.process(character, target_character, attack_part)
+        character.history_actions.push_back(action)
+        character.round_state = character.round_state.switch_to_end()
     func character_action_undo(character_id):
         var character = self.get_character(character_id)
         var recent_action = character.history_actions.back()
