@@ -6,6 +6,7 @@ var characters = {}
 
 func init(pos = Vector2(0, 0)):
     $TileMap.position = pos
+    $Cursor.init(Vector2(0, 0))
     
     Events.connect("MAP_RERENDER", self, "render_round")
     Events.connect("MAP_SHOW_CHARACTER_MOVE_RANGE", self, "show_character_move_range")
@@ -13,12 +14,6 @@ func init(pos = Vector2(0, 0)):
     Events.connect("MAP_SHOW_CHARACTER_ATTACK_RANGE", self, "show_character_attack_range")
     Events.connect("MAP_HIDE_CHARACTER_ATTACK_RANGE", self, "hide_character_attack_range")
     Events.connect("MAP_MOVE_CHARACTER", self, "move_character")
-    Game.connect("game_init_cursor", self, "create_cursor")
-    
-func create_cursor(map_pos):
-    var Cursor = load("res://components/Cursor.tscn").instance()
-    add_child(Cursor)
-    Cursor.init(map_pos)
     
 func render_round(latest_round):
     print(latest_round)

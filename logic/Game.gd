@@ -1,5 +1,4 @@
 extends Node
-signal game_init_cursor(map_pos)
         
 const TILE_SIZE = 16
 const TILE_NUM_X = 30
@@ -22,10 +21,6 @@ func init():
     mock_characters[mock_player.id] = mock_player
     mock_characters[mock_enemy.id] = mock_enemy
     round_manager = RoundManager.RoundManager.new(map, mock_characters)
-    
-    # emit signal update view
-    emit_signal("game_init_cursor", Map.MapPos.new())
-    
     round_manager.start()
 
 func _input(event):
