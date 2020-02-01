@@ -47,6 +47,9 @@ func _ready():
     }]
     $ActionPanel.init(action_options)
     
+    var mock_messages = [{ "text": "asda"}, { "text": "Wersd"}]
+    $MessagePanel.init(mock_messages)
+    
     Events.connect("SHOW_ACTION_PANEL", self, "show_action_panel")
     Events.connect("HIDE_ACTION_PANEL", self, "hide_action_panel")
     Events.connect("SHOW_ATTACK_PANEL", self, "show_attack_panel")

@@ -53,9 +53,9 @@ func handle_cursor_select():
         current_round.show_character_move_range(pointing_character.id)
     elif selecting_character != null:
         if selecting_character.round_state is RoundState.RoundStateMoveSelecting:
-            current_round.move_character(selecting_character.id, cursor.pos)
+            current_round.move_character(selecting_character.id, cursor.pos.clone())
         elif selecting_character.round_state is RoundState.RoundStateAttackSelecting:
-            current_round.show_attack_part(selecting_character.id, cursor.pos)
+            current_round.show_attack_part(selecting_character.id, cursor.pos.clone())
 
 func on_attack_option_press(attack_part):
     var current_round = round_manager.get_current_round()
