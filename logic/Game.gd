@@ -1,17 +1,5 @@
 extends Node
-signal game_show_character_move_range(move_range)
-signal game_hide_character_move_range()
-signal game_show_character_attack_range(attack)
-signal game_hide_character_attack_range()
-signal game_move_character(character_id, move_pos)
 signal game_init_cursor(map_pos)
-signal game_move_cursor(mapPos)
-signal game_show_action_panel()
-signal game_hide_action_panel()
-signal game_show_attack_panel()
-signal game_hide_attack_panel()
-signal game_action_attack()
-signal game_action_wait()
         
 const TILE_SIZE = 16
 const TILE_NUM_X = 30
@@ -21,7 +9,6 @@ var cursor
 var round_manager
 var cache_select_character_move_range
 var cache_select_character_attack_range
-#var during_action_select = false
 
 func init():
     cache_select_character_move_range = Utils.Set.new()
@@ -40,7 +27,6 @@ func init():
     emit_signal("game_init_cursor", Map.MapPos.new())
     
     round_manager.start()
-    RoundManager.emit_signal("ROUND_MANAGER_NEXT_ROUND", round_manager.get_current_round())
 
 func _input(event):
     if !(event is InputEventKey):
@@ -58,7 +44,6 @@ func _input(event):
         
     if xDirection != 0 || yDirection != 0:
         cursor.move_to(cursor_pos)
-        emit_signal("game_move_cursor", cursor_pos)
         
 #    if event.is_action("ui_cancel"):
 #        if (cursor.selected_item is Character.Character && 

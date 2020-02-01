@@ -13,8 +13,6 @@ func hide():
     $VBoxContainer.hide()
 
 func on_attack_btn_press():
-    Game.emit_signal("game_action_attack")
-    Game.emit_signal("game_hide_action_panel")
+    Events.emit_signal("ACTION_ATTACK_PRESS")
 func on_wait_btn_press():
-    Game.emit_signal("game_action_wait")    
-    Game.emit_signal("game_hide_action_panel")
+    Events.emit_signal("ACTION_WAIT_PRESS")

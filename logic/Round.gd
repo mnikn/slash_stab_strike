@@ -40,8 +40,8 @@ class Round:
     func _init(map, characters = {}):
         self._map = map
         self.characters = characters
-        Game.connect("game_action_attack", self, "show_character_attack_range")
-        Game.connect("game_action_wait", self, "character_wait")
+        Events.connect("ACTION_ATTACK_PRESS", self, "show_character_attack_range")
+        Events.connect("ACTION_WAIT_PRESS", self, "character_wait")
     func get_character(id):
         return self.characters[id]
     func get_character_by_pos(pos):
@@ -68,7 +68,7 @@ class Round:
         if character.round_state != CHARACTER_ROUND_STATE.IDLE:
             return
         var move_range = self.get_character_move_range(character_id)
-        Game.emit_signal("game_show_character_move_range", move_range.to_array())
+        Events.emit_signal("MAP_SHOW_CHARACTER_MOVE_RANGE", move_range.to_array())
         character.round_state = CHARACTER_ROUND_STATE.MOVE_SELECTING
     func move_character(character_id, target_pos):
         var character = self.get_character(character_id)
@@ -76,9 +76,9 @@ class Round:
             return
         var move_range = self.get_character_move_range(character_id)
         if move_range.has(target_pos):
-            Game.emit_signal("game_move_character", character.id, target_pos.clone())
-            Game.emit_signal("game_hide_character_move_range")
-            Game.emit_signal("game_show_action_panel")
+            Events.emit_signal("MAP_MOVE_CHARACTER", character.id, target_pos.clone())
+            Events.emit_signal("MAP_HIDE_CHARACTER_MOVE_RANGE")
+            Events.emit_signal("SHOW_ACTION_PANEL")
             character.pos = target_pos.clone()
             character.round_state = CHARACTER_ROUND_STATE.ACTION_SELECTING
             character.history_action_list.append({"type": CHARACTER_ACTION.MOVE, "target_pos": target_pos})
@@ -87,14 +87,16 @@ class Round:
         if character == null || character.round_state != CHARACTER_ROUND_STATE.ACTION_SELECTING:
             return
         var attack_range = self.get_character_attack_range(character.id)
-        Game.emit_signal("game_show_character_attack_range", attack_range.to_array())
-        Game.emit_signal("game_hide_action_panel")
+        Events.emit_signal("MAP_SHOW_CHARACTER_ATTACK_RANGE", attack_range.to_array())
+        Events.emit_signal("HIDE_ACTION_PANEL")
+        
     func character_wait():
         var character = self.get_selecting_character()
         if character == null || character.round_state != CHARACTER_ROUND_STATE.ACTION_SELECTING:
             return
         character.round_state = CHARACTER_ROUND_STATE.IDLE
         character.history_action_list.append({"type": CHARACTER_ACTION.WAIT})
+        Events.emit_signal("HIDE_ACTION_PANEL")
 
     func get_character_move_range(character_id):
         var character = self.get_character(character_id)

@@ -6,12 +6,13 @@ var characters = {}
 
 func init(pos = Vector2(0, 0)):
     $TileMap.position = pos
-    RoundManager.connect("ROUND_MANAGER_NEXT_ROUND", self, "render_round")
-    Game.connect("game_show_character_move_range", self, "show_character_move_range")
-    Game.connect("game_hide_character_move_range", self, "hide_character_move_range")
-    Game.connect("game_show_character_attack_range", self, "show_character_attack_range")
-    Game.connect("game_hide_character_attack_range", self, "hide_character_attack_range")
-    Game.connect("game_move_character", self, "move_character")
+    
+    Events.connect("MAP_RERENDER", self, "render_round")
+    Events.connect("MAP_SHOW_CHARACTER_MOVE_RANGE", self, "show_character_move_range")
+    Events.connect("MAP_HIDE_CHARACTER_MOVE_RANGE", self, "hide_character_move_range")
+    Events.connect("MAP_SHOW_CHARACTER_ATTACK_RANGE", self, "show_character_attack_range")
+    Events.connect("MAP_HIDE_CHARACTER_ATTACK_RANGE", self, "hide_character_attack_range")
+    Events.connect("MAP_MOVE_CHARACTER", self, "move_character")
     Game.connect("game_init_cursor", self, "create_cursor")
     
 func create_cursor(map_pos):

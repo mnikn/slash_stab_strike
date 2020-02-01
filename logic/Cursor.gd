@@ -7,4 +7,5 @@ class Cursor:
         self._map = map
         self.pos = pos
     func move_to(target_pos):
-        self.pos = target_pos.clone()
+        self.pos = target_pos
+        Events.emit_signal("MAP_MOVE_CURSOR", target_pos)

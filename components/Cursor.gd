@@ -18,9 +18,9 @@ func init(map_pos):
     cameraNode.limit_right = get_node("/root/Game").TILE_SIZE * get_node("/root/Game").TILE_NUM_X
     cameraNode.limit_bottom = get_node("/root/Game").TILE_SIZE * get_node("/root/Game").TILE_NUM_Y
     
-    game.connect("game_move_cursor", self, "updateCursorPos")
+    Events.connect("MAP_MOVE_CURSOR", self, "update_cursor_pos")
     
-func updateCursorPos(tilePos):
+func update_cursor_pos(tilePos):
     $Rect.set_position(Vector2(tilePos.x * game.TILE_SIZE, tilePos.y * game.TILE_SIZE))
     
 func setCursorVisible(visible):
