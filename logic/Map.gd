@@ -18,18 +18,6 @@ class Map:
             if item.pos.equal(pos):
                 return item
         return null
-    #func set(pos, val):
-    #    for i in range(len(_map)):
-    #        if _map[i].pos.equal(pos):
-    #            _map[i] = val
-    #    var item = { "pos": pos, "type": val["type"]}
-    #    _map.push_back(item)
-#    func find(type):
-#        var result = []
-#        for item in _map:
-#            if item.type == type:
-#                result.push_back(item)
-#        return result
     func find_by_id(id):
         for item in _map:
             if item.id != null && item.id == id:
@@ -38,7 +26,7 @@ class Map:
     func to_string():
         var res = ""
         for item in _map:
-            res += "pos: " + item.pos.to_string() + " item: " + str(item.item) + "\n"
+            res += "pos: " + item.pos.to_string() + " item: " + "\n"
         return res
     
 
@@ -67,7 +55,6 @@ enum TERRAIN_TYPE {
 
 class MapItem:
     var terrain_type
-    var item
     var id
     var pos
     func _init(pos = MapPos.new(), type = TERRAIN_TYPE.PLAIN, id = null):
