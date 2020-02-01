@@ -34,6 +34,7 @@ func init():
     var mock_enemy_pos = Map.MapPos.new(20, 15)
     map.get(mock_enemy_pos).item = Character.Character.new(map, mock_enemy_pos)
     map.get(mock_enemy_pos).item.id = 2
+    map.get(mock_enemy_pos).item.type = Character.CHARACTER_TYPE.ENEMY
     
     # emit signal update view
     emit_signal("game_init_map")
@@ -80,7 +81,7 @@ func handle_cursor_select():
         cache_select_character_move_range.clear()
         cursor.diselect()
         emit_signal("game_hide_character_move_range")
-    elif current_pos_item is Character.Character:
+    elif current_pos_item is Character.Character && current_pos_item.type == Character.CHARACTER_TYPE.PLAYER:
         var move_range = current_pos_item.get_move_range()
         cache_select_character_move_range = move_range
         cursor.select(current_pos_item)

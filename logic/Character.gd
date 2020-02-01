@@ -1,15 +1,22 @@
 extends Node
 
+enum CHARACTER_TYPE {
+    PLAYER,
+    ENEMY
+}
+
 class Character:
     var id
     var _map
     var pos
     var _step
     var active
+    var type
     func _init(map, pos = Map.MapPos.new()):
-        _map = map
-        _step = 4
+        self._map = map
         self.pos = pos
+        self._step = 4        
+        self.type = CHARACTER_TYPE.PLAYER
     func move_to(target_pos):
         var next_pos = target_pos.clone()
         _map.get(self.pos).item = null
@@ -25,7 +32,7 @@ class Character:
             current_pos.y < 0 || 
             current_pos.y >= _map.height):
             return results
-        if self._map.get(current_pos).terrain_type == Map.TERRAIN_TYPE.BLOCK:
+        if self._map.get(current_pos).terrain_type == Map.TERRAIN_TYPE.BLOCK || (!current_pos.equal(self.pos) && self._map.get(current_pos).item is Character):
             return results
         results.append(current_pos)
         _do_get_move_range(Map.MapPos.new(current_pos.x + 1, current_pos.y), limit_step - 1, results)
