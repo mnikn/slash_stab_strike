@@ -5,10 +5,16 @@ var characters = {}
 
 func init(pos = Vector2(0, 0)):
     $TileMap.position = pos
-    Game.connect("game_init_character", self, "create_character")
+    Game.connect("game_create_character", self, "create_character")
     Game.connect("game_show_character_move_range", self, "show_character_move_range")
     Game.connect("game_hide_character_move_range", self, "hide_character_move_range")
     Game.connect("game_move_character", self, "move_character")
+    Game.connect("game_init_cursor", self, "create_cursor")
+    
+func create_cursor(map_pos):
+    var Cursor = load("res://components/Cursor.tscn").instance()
+    add_child(Cursor)
+    Cursor.init(map_pos)
     
 func create_character(map_pos = Game.MapPos.new(), character_id = -1):
     var Character = load("res://components/Character.tscn").instance()

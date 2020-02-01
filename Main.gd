@@ -6,7 +6,6 @@ var action_panel
 func _ready():
     game = get_node("/root/Game")
     game.connect("game_init_map", self, "create_map")  
-    game.connect("game_init_cursor", self, "create_cursor")
     game.connect("game_create_attack_panel", self, "create_attack_panel")
     game.connect("game_create_action_panel", self, "create_action_panel")
     game.connect("game_destory_action_panel", self, "destory_action_panel")    
@@ -16,11 +15,6 @@ func create_map():
     map = load("res://components/Map.tscn").instance()
     add_child(map)
     map.init(Vector2(0, 0))
-
-func create_cursor(tilePos = Vector2(0, 0)):
-    var Cursor = load("res://components/Cursor.tscn").instance()
-    add_child(Cursor)
-    Cursor.init(Utils.get_physic_pos(tilePos))
 
 func create_attack_panel():
     var attack_panel = load("res://components/AttackPanel.tscn").instance()

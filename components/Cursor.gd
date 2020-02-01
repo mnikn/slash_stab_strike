@@ -7,8 +7,8 @@ var cursorActive = false
 func _ready():
     game = get_node("/root/Game")
 
-func init(pos = Vector2(0, 0)):
-    $Rect.rect_position = pos
+func init(map_pos):
+    $Rect.rect_position = Utils.get_physic_pos(map_pos)
     setCursorVisible(true)
     setCursorActive(false)
     
