@@ -25,6 +25,8 @@ Utils="*res://logic/Utils.gd"
 Map="*res://logic/Map.gd"
 Character="*res://logic/Character.gd"
 Cursor="*res://logic/Cursor.gd"
+Round="*res://logic/Round.gd"
+RoundManager="*res://logic/RoundManager.gd"
 Game="*res://logic/Game.gd"
 
 [display]
