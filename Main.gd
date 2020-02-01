@@ -30,7 +30,22 @@ func _ready():
         "callback": attack_option_press_callback  
     }]
     $AttackPanel.init(attack_options)
-    $ActionPanel.init(Vector2(570, 30))
+    
+    var action_option_press_callback = funcref(Game, 'on_action_option_press')    
+    var action_options = [{
+        "label": "Attack",
+        "id": Character.CHARACTER_ACTION.ATTACK,
+        "callback": action_option_press_callback
+    }, {
+        "label": "Wait",
+        "id": Character.CHARACTER_ACTION.WAIT,
+        "callback": action_option_press_callback
+    }, {
+        "label": "Canel",
+        "id": Character.CHARACTER_ACTION.CANCEL,
+        "callback": action_option_press_callback
+    }]
+    $ActionPanel.init(action_options)
     
     Events.connect("SHOW_ACTION_PANEL", self, "show_action_panel")
     Events.connect("HIDE_ACTION_PANEL", self, "hide_action_panel")

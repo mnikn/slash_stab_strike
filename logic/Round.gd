@@ -25,11 +25,10 @@ class RoundCharacter:
 class Round:
     var _map
     var characters
+    var selected_target_character
     func _init(map, characters = {}):
         self._map = map
         self.characters = characters
-        Events.connect("ACTION_ATTACK_PRESS", self, "show_character_attack_range")
-        Events.connect("ACTION_WAIT_PRESS", self, "character_wait")
     func get_character(id):
         return self.characters[id]
     func get_character_by_pos(pos):
@@ -55,10 +54,11 @@ class Round:
             return
         var attack_range = self.get_character_attack_range(character_id)
         if attack_range.has(target_pos):
+            self.selected_target_character = target_character
             character.round_state = character.round_state.switch_to_attack_part_selecting(target_character)
-    func attack_character(character_id, target_character_id, attack_part):
-        var character = self.get_character(character_id)
-        var target_character = self.get_character(target_character_id)
+    func attack(attack_part):
+        var character = self.get_selecting_character()
+        var target_character = self.selected_target_character
         if target_character == null || !(character.round_state is RoundState.RoundStateAttackPartSelecting):
             return
         var action = RoundAction.RoundActionAttack.new()
@@ -111,7 +111,7 @@ class Round:
         var action = RoundAction.RoundActionWait.new()
         action.process()
         character.history_actions.append(action)
-        character.round_state = character.round_state.switch_to_idle()
+        character.round_state = character.round_state.switch_to_end()
 
     func get_character_move_range(character_id):
         var character = self.get_character(character_id)
@@ -138,3 +138,4 @@ class Round:
         return results
     func _filter_character(character, current_pos):
         return !current_pos.equal(character.pos) && self.get_character_by_pos(current_pos) != null
+            

@@ -17,6 +17,9 @@ class RoundStateActionSelecting extends RoundState:
         Events.emit_signal("MAP_SHOW_CHARACTER_ATTACK_RANGE", attack_range.to_array())
         Events.emit_signal("HIDE_ACTION_PANEL")
         return RoundStateAttackSelecting.new()
+    func switch_to_end():
+        Events.emit_signal("HIDE_ACTION_PANEL")        
+        return RoundStateEnd.new()
 
 class RoundStateMoveSelecting extends RoundState:
     func switch_to_idle():

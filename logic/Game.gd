@@ -59,6 +59,13 @@ func handle_cursor_select():
 
 func on_attack_option_press(attack_part):
     var current_round = round_manager.get_current_round()
-    var targert_character =  current_round.get_character_by_pos(cursor.pos)
-    current_round.attack_character(current_round.get_selecting_character().id, targert_character.id, attack_part)
-    print(attack_part)
+    current_round.attack(attack_part)
+
+func on_action_option_press(action_type):
+    var current_round = round_manager.get_current_round()    
+    if action_type == Character.CHARACTER_ACTION.ATTACK:
+        current_round.show_character_attack_range()
+    elif action_type == Character.CHARACTER_ACTION.WAIT:
+        current_round.character_wait()
+    elif action_type == Character.CHARACTER_ACTION.CANCEL:
+        current_round.cancel_action()

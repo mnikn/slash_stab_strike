@@ -9,6 +9,12 @@ enum CHARACTER_PART {
     RIGHT_LEG    
 }
 
+enum CHARACTER_ACTION {
+    ATTACK,
+    WAIT,
+    CANCEL    
+}
+
 class Character:
     var step
     var attack_range
