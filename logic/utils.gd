@@ -1,5 +1,7 @@
 extends Node
 
+var global_id = 0
+
 class Set:
     var _dic = {}
     func append(item):
@@ -21,3 +23,8 @@ class Set:
         
 func get_physic_pos(map_pos):
     return Vector2(map_pos.x * Game.TILE_SIZE, map_pos.y * Game.TILE_SIZE)
+    
+func new_id():
+    var res = str(global_id + 1)
+    global_id += 1
+    return res

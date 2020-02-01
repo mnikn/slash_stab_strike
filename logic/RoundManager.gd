@@ -1,4 +1,5 @@
 extends Node
+signal ROUND_MANAGER_NEXT_ROUND(latest_round)
 
 enum CHARACTER_TYPE {
     PLAYER,
@@ -8,13 +9,15 @@ enum CHARACTER_TYPE {
 class RoundManager:
     var _characters
     var _rounds
-    func _init(characters = []):
+    var _map
+    func _init(map, characters = {}):
+        self._map = map
         self._characters = characters
         self._rounds = []
     func start():
         self.next_round()
     func next_round():
-        var new_round = Round.Round.new(self._characters)
+        var new_round = Round.Round.new(self._map, self._characters)
         self._rounds.push_back(new_round)
-    func get_current_rounds():
+    func get_current_round():
         return self._rounds.back()

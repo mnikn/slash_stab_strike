@@ -3,9 +3,8 @@ signal game_show_character_move_range(move_range)
 signal game_hide_character_move_range()
 signal game_show_character_attack_range(attack)
 signal game_hide_character_attack_range()
-signal game_move_character(move_pos, character_id)
+signal game_move_character(character_id, move_pos)
 signal game_init_cursor(map_pos)
-signal game_create_character(map_pos, character_id)
 signal game_move_cursor(mapPos)
 signal game_show_action_panel()
 signal game_hide_action_panel()
@@ -19,9 +18,10 @@ const TILE_NUM_X = 30
 const TILE_NUM_Y = 30
 var map
 var cursor
+var round_manager
 var cache_select_character_move_range
 var cache_select_character_attack_range
-var during_action_select = false
+#var during_action_select = false
 
 func init():
     cache_select_character_move_range = Utils.Set.new()
@@ -29,23 +29,18 @@ func init():
     map = Map.Map.new(TILE_NUM_X, TILE_NUM_Y)
     cursor = Cursor.Cursor.new(map)
     
-    var mock_character_pos = Map.MapPos.new(10, 10)
-    map.get(mock_character_pos).item = Character.Character.new(map, mock_character_pos)
-    map.get(mock_character_pos).item.id = 1
-    
-    
-    var mock_enemy_pos = Map.MapPos.new(20, 15)
-    map.get(mock_enemy_pos).item = Character.Character.new(map, mock_enemy_pos)
-    map.get(mock_enemy_pos).item.id = 2
-    map.get(mock_enemy_pos).item.type = Character.CHARACTER_TYPE.ENEMY
+    var mock_player = Round.RoundCharacter.new(Character.Character.new(), Map.MapPos.new(5, 5), Round.CHARACTER_TEAM.PLAYER)
+    var mock_enemy = Round.RoundCharacter.new(Character.Character.new(), Map.MapPos.new(7, 7), Round.CHARACTER_TEAM.ENEMY)
+    var mock_characters = {}
+    mock_characters[mock_player.id] = mock_player
+    mock_characters[mock_enemy.id] = mock_enemy
+    round_manager = RoundManager.RoundManager.new(map, mock_characters)
     
     # emit signal update view
     emit_signal("game_init_cursor", Map.MapPos.new())
-    emit_signal("game_create_character", mock_character_pos, 1)
-    emit_signal("game_create_character", mock_enemy_pos, 2)
     
-    connect("game_action_attack", self, "on_action_attack")
-    connect("game_action_wait", self, "on_action_wait")
+    round_manager.start()
+    RoundManager.emit_signal("ROUND_MANAGER_NEXT_ROUND", round_manager.get_current_round())
 
 func _input(event):
     if !(event is InputEventKey):
@@ -78,46 +73,14 @@ func _input(event):
         handle_cursor_select()
 
 func handle_cursor_select():
-    if during_action_select:
-        return
-
-    var current_pos_item = map.get(cursor.pos).item
-    if cursor.selected_item is Character.Character && cursor.selected_item.type == Character.CHARACTER_TYPE.PLAYER:
-        var player_character = cursor.selected_item
-        if (player_character.action_state == Character.CHARACTER_ACTION_STATE.ATTACK 
-            && cache_select_character_attack_range.has(cursor.pos) 
-            && current_pos_item is Character.Character 
-            && current_pos_item.type == Character.CHARACTER_TYPE.ENEMY):
-            ## todo: do real process
-            emit_signal("game_show_attack_panel")
-            emit_signal("game_hide_character_attack_range")
-            player_character.switch_to_state(Character.CHARACTER_ACTION_STATE.IDLE)
-            cache_select_character_attack_range.clear()
-            cursor.diselect()
-        elif player_character.action_state == Character.CHARACTER_ACTION_STATE.IDLE:
-            var cursor_pos = cursor.pos
-            if cache_select_character_move_range.has(cursor_pos):
-                cursor.selected_item.move_to(cursor_pos)            
-                emit_signal("game_move_character", cursor_pos, cursor.selected_item.id)
-                emit_signal("game_show_action_panel")
-                during_action_select = true
-            else:
-                cursor.diselect()
-            cache_select_character_move_range.clear()
-            emit_signal("game_hide_character_move_range")
-    elif current_pos_item is Character.Character && current_pos_item.type == Character.CHARACTER_TYPE.PLAYER:
-        if current_pos_item.action_state == Character.CHARACTER_ACTION_STATE.IDLE:
-            var move_range = current_pos_item.get_move_range()
-            cache_select_character_move_range = move_range
-            cursor.select(current_pos_item)
-            emit_signal("game_show_character_move_range", move_range.to_array())
-    else:
-        cursor.diselect()
-
-func on_action_attack():
-    during_action_select = false
-    cursor.selected_item.switch_to_state(Character.CHARACTER_ACTION_STATE.ATTACK)
-    cache_select_character_attack_range = cursor.selected_item.get_attack_range()
-    emit_signal("game_show_character_attack_range", cache_select_character_attack_range.to_array())    
-func on_action_wait():
-    during_action_select = false
+    var current_round = round_manager.get_current_round()
+    var pointing_character = current_round.get_character_by_pos(cursor.pos)
+    var selecting_character = current_round.get_selecting_character()
+    if pointing_character != null && pointing_character.team == Round.CHARACTER_TEAM.PLAYER && pointing_character.round_state == Round.CHARACTER_ROUND_STATE.IDLE:
+        current_round.show_character_move_range(pointing_character.id)
+    elif selecting_character != null:
+        if selecting_character.round_state == Round.CHARACTER_ROUND_STATE.MOVE_SELECTING:
+            current_round.move_character(selecting_character.id, cursor.pos)
+        elif selecting_character.round_state == Round.CHARACTER_ROUND_STATE.ATTACK_SELECTING:
+            pass
+            #current_round.character_select_attack_target(selecting_character.id)

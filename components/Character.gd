@@ -1,11 +1,11 @@
 extends Node
 
-var id
+var character
 
-func init(map_pos, character_id):
-    var pos = Utils.get_physic_pos(map_pos)
+func init(character):
+    var pos = Utils.get_physic_pos(character.pos)
     $Sprite.position = pos
-    id = character_id
+    self.character = character
     
 func move_to(map_pos):
     $Sprite.position = Utils.get_physic_pos(map_pos)

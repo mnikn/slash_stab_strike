@@ -6,7 +6,7 @@ var characters = {}
 
 func init(pos = Vector2(0, 0)):
     $TileMap.position = pos
-    Game.connect("game_create_character", self, "create_character")
+    RoundManager.connect("ROUND_MANAGER_NEXT_ROUND", self, "render_round")
     Game.connect("game_show_character_move_range", self, "show_character_move_range")
     Game.connect("game_hide_character_move_range", self, "hide_character_move_range")
     Game.connect("game_show_character_attack_range", self, "show_character_attack_range")
@@ -19,11 +19,13 @@ func create_cursor(map_pos):
     add_child(Cursor)
     Cursor.init(map_pos)
     
-func create_character(map_pos = Game.MapPos.new(), character_id = -1):
-    var Character = load("res://components/Character.tscn").instance()
-    add_child(Character)
-    Character.init(map_pos, character_id)
-    characters[character_id] = Character
+func render_round(latest_round):
+    print(latest_round)
+    for character in latest_round.characters.values():
+        var node = load("res://components/Character.tscn").instance()
+        add_child(node)
+        node.init(character)
+        characters[character.id] = node
     
 func show_character_move_range(move_range):
     for pos in move_range:
@@ -51,7 +53,7 @@ func hide_character_attack_range():
         remove_child(rect)
     attack_range_rects = []
 
-func move_character(map_pos, character_id):
+func move_character(character_id, map_pos):
     if characters.has(character_id):
         characters[character_id].move_to(map_pos)
     
