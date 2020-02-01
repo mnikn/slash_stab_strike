@@ -66,8 +66,17 @@ func _input(event):
     if xDirection != 0 || yDirection != 0:
         cursor.move_to(cursor_pos)
         emit_signal("game_move_cursor", cursor_pos)
-    
-    if event.is_action_pressed("select"):
+        
+#    if event.is_action("ui_cancel"):
+#        if (cursor.selected_item is Character.Character && 
+#            cursor.selected_item.type == Character.CHARACTER_TYPE.PLAYER && 
+#            cursor.selected_item.type == Character.CHARACTER_ACTION_STATE.ATTACK):
+#
+#            # cursor.selected_item.switch_to_state(Character.CHARACTER_ACTION_STATE.IDLE)
+#            emit_signal("game_hide_character_attack_range")
+#            emit_signal("game_create_action_panel")
+#            during_action_select = true
+    elif event.is_action_pressed("select"):
         handle_cursor_select()
 
 func handle_cursor_select():
@@ -77,8 +86,12 @@ func handle_cursor_select():
     var current_pos_item = map.get(cursor.pos).item
     if cursor.selected_item is Character.Character && cursor.selected_item.type == Character.CHARACTER_TYPE.PLAYER:
         var player_character = cursor.selected_item
-        if player_character.action_state == Character.CHARACTER_ACTION_STATE.ATTACK && cache_select_character_attack_range.has(cursor.pos):
+        if (player_character.action_state == Character.CHARACTER_ACTION_STATE.ATTACK 
+            && cache_select_character_attack_range.has(cursor.pos) 
+            && current_pos_item is Character.Character 
+            && current_pos_item.type == Character.CHARACTER_TYPE.ENEMY):
             ## todo: do real process
+            emit_signal("game_create_attack_panel")
             emit_signal("game_hide_character_attack_range")
             player_character.switch_to_state(Character.CHARACTER_ACTION_STATE.IDLE)
             cache_select_character_attack_range.clear()

@@ -19,6 +19,7 @@ func create_map():
 func create_attack_panel():
     var attack_panel = load("res://components/AttackPanel.tscn").instance()
     add_child(attack_panel)
+    attack_panel.init(Vector2(320, 250))
 
 func create_action_panel():
     action_panel = load("res://components/ActionPanel.tscn").instance()
