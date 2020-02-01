@@ -40,15 +40,8 @@ func _input(event):
     if xDirection != 0 || yDirection != 0:
         cursor.move_to(cursor_pos)
         
-#    if event.is_action("ui_cancel"):
-#        if (cursor.selected_item is Character.Character && 
-#            cursor.selected_item.type == Character.CHARACTER_TYPE.PLAYER && 
-#            cursor.selected_item.type == Character.CHARACTER_ACTION_STATE.ATTACK):
-#
-#            # cursor.selected_item.switch_to_state(Character.CHARACTER_ACTION_STATE.IDLE)
-#            emit_signal("game_hide_character_attack_range")
-#            emit_signal("game_create_action_panel")
-#            during_action_select = true
+    if event.is_action_pressed("ui_cancel"):
+        round_manager.get_current_round().cancel_action()
     elif event.is_action_pressed("select"):
         handle_cursor_select()
 

@@ -9,7 +9,7 @@ enum CHARACTER_ROUND_STATE {
 }
 
 enum CHARACTER_ACTION {
-    MOVE,    
+    MOVE,
     ATTACK,
     WAIT
 }
@@ -22,17 +22,19 @@ enum CHARACTER_TEAM {
 class RoundCharacter:
     var id
     var info
+    var initial_pos
     var pos
     var team
     var round_state
-    var history_action_list
+    var history_actions
     func _init(character, pos, team):
         self.id = Utils.new_id()
         self.info = character
         self.pos = pos
         self.team = team
         self.round_state = CHARACTER_ROUND_STATE.IDLE
-        self.history_action_list = []
+        self.history_actions = []
+        self.initial_pos = pos
         
 class Round:
     var _map
@@ -59,10 +61,25 @@ class Round:
         
     func character_attack(character_id, target_character_id):
         pass
-    func character_move(character_id, target_pos):
-        pass
     func character_action_undo(character_id):
-        pass
+        var character = self.get_character(character_id)
+        var recent_action = character.history_actions.back()
+        if recent_action != null:
+            if recent_action.type == CHARACTER_ACTION.MOVE:
+                character.pos = character.initial_pos.clone()
+                Events.emit_signal("MAP_MOVE_CHARACTER", character.id, character.pos.clone())
+            character.history_actions.pop_back()
+    func cancel_action():
+        var character = self.get_selecting_character()
+        if character != null && character.round_state != CHARACTER_ROUND_STATE.END:
+            if character.round_state == CHARACTER_ROUND_STATE.ACTION_SELECTING:
+                self.character_action_undo(character.id)
+                Events.emit_signal("HIDE_ACTION_PANEL")
+                character.round_state = CHARACTER_ROUND_STATE.IDLE
+            elif character.round_state == CHARACTER_ROUND_STATE.ATTACK_SELECTING:
+                Events.emit_signal("MAP_HIDE_CHARACTER_ATTACK_RANGE")
+                Events.emit_signal("SHOW_ACTION_PANEL")
+                character.round_state = CHARACTER_ROUND_STATE.ACTION_SELECTING
     func show_character_move_range(character_id):
         var character = self.get_character(character_id)
         if character.round_state != CHARACTER_ROUND_STATE.IDLE:
@@ -81,7 +98,7 @@ class Round:
             Events.emit_signal("SHOW_ACTION_PANEL")
             character.pos = target_pos.clone()
             character.round_state = CHARACTER_ROUND_STATE.ACTION_SELECTING
-            character.history_action_list.append({"type": CHARACTER_ACTION.MOVE, "target_pos": target_pos})
+            character.history_actions.append({"type": CHARACTER_ACTION.MOVE, "target_pos": target_pos})
     func show_character_attack_range():
         var character = self.get_selecting_character()
         if character == null || character.round_state != CHARACTER_ROUND_STATE.ACTION_SELECTING:
@@ -89,13 +106,14 @@ class Round:
         var attack_range = self.get_character_attack_range(character.id)
         Events.emit_signal("MAP_SHOW_CHARACTER_ATTACK_RANGE", attack_range.to_array())
         Events.emit_signal("HIDE_ACTION_PANEL")
+        character.round_state = CHARACTER_ROUND_STATE.ATTACK_SELECTING
         
     func character_wait():
         var character = self.get_selecting_character()
         if character == null || character.round_state != CHARACTER_ROUND_STATE.ACTION_SELECTING:
             return
         character.round_state = CHARACTER_ROUND_STATE.IDLE
-        character.history_action_list.append({"type": CHARACTER_ACTION.WAIT})
+        character.history_actions.append({"type": CHARACTER_ACTION.WAIT})
         Events.emit_signal("HIDE_ACTION_PANEL")
 
     func get_character_move_range(character_id):
